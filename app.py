@@ -10,52 +10,63 @@ from collections import deque
 import cv2 as cv
 import numpy as np
 import mediapipe as mp
+import pyrealsense2 as rs
 
 from utils import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
 
 
-def get_args():
-    parser = argparse.ArgumentParser()
+# def get_args():
+#     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--device", type=int, default=0)
-    parser.add_argument("--width", help='cap width', type=int, default=960)
-    parser.add_argument("--height", help='cap height', type=int, default=540)
+#     parser.add_argument("--device", type=int, default=0)
+#     parser.add_argument("--width", help='cap width', type=int, default=960)
+#     parser.add_argument("--height", help='cap height', type=int, default=540)
 
-    parser.add_argument('--use_static_image_mode', action='store_true')
-    parser.add_argument("--min_detection_confidence",
-                        help='min_detection_confidence',
-                        type=float,
-                        default=0.7)
-    parser.add_argument("--min_tracking_confidence",
-                        help='min_tracking_confidence',
-                        type=int,
-                        default=0.5)
+#     parser.add_argument('--use_static_image_mode', action='store_true')
+#     parser.add_argument("--min_detection_confidence",
+#                         help='min_detection_confidence',
+#                         type=float,
+#                         default=0.7)
+#     parser.add_argument("--min_tracking_confidence",
+#                         help='min_tracking_confidence',
+#                         type=int,
+#                         default=0.5)
 
-    args = parser.parse_args()
+#     args = parser.parse_args()
 
-    return args
+#     return args
 
 
 def main():
     # Argument parsing #################################################################
-    args = get_args()
+    #args = get_args()
+    #real-sense related
 
-    cap_device = args.device
-    cap_width = args.width
-    cap_height = args.height
+    pipeline = rs.pipeline()
+    config = rs.config()
+    config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+    pipeline.start(config)
 
-    use_static_image_mode = args.use_static_image_mode
-    min_detection_confidence = args.min_detection_confidence
-    min_tracking_confidence = args.min_tracking_confidence
+    #cap_device = args.device
+    #cap_width = args.width
+    #cap_height = args.height
+
+    # use_static_image_mode = args.use_static_image_mode
+    # min_detection_confidence = args.min_detection_confidence
+    # min_tracking_confidence = args.min_tracking_confidence
+
+    use_static_image_mode = False
+    min_detection_confidence = 0.5
+    min_tracking_confidence = 0.5
 
     use_brect = True
-
     # Camera preparation ###############################################################
-    cap = cv.VideoCapture(cap_device)
-    cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
-    cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
+    #cap = cv.VideoCapture(cap_device)
+    #cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
+    #cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
+    
 
     # Model load #############################################################
     mp_hands = mp.solutions.hands
@@ -99,8 +110,9 @@ def main():
     mode = 0
 
     while True:
-        fps = cvFpsCalc.get()
 
+        fps = cvFpsCalc.get()
+        
         # Process Key (ESC: end) #################################################
         key = cv.waitKey(10)
         if key == 27:  # ESC
@@ -108,9 +120,22 @@ def main():
         number, mode = select_mode(key, mode)
 
         # Camera capture #####################################################
-        ret, image = cap.read()
-        if not ret:
-            break
+        #ret, image = cap.read()
+        frames = pipeline.wait_for_frames()
+        image = frames.get_color_frame()
+        print (image)
+        image = np.asanyarray(image.get_data())
+        print("testing")
+
+        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+        
+        if not image:
+            print("Ignoring empty camera frame.")
+            # If loading a video, use 'break' instead of 'continue'.
+            continue
+
+        # if not ret:
+        #     break
         image = cv.flip(image, 1)  # Mirror display
         debug_image = copy.deepcopy(image)
 
@@ -177,7 +202,7 @@ def main():
         # Screen reflection #############################################################
         cv.imshow('Hand Gesture Recognition', debug_image)
 
-    cap.release()
+    #cap.release()
     cv.destroyAllWindows()
 
 
