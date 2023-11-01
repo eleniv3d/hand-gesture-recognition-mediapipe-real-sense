@@ -47,6 +47,8 @@ def main():
     pipeline = rs.pipeline()
     config = rs.config()
     config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+    config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+
     pipeline.start(config)
 
     #cap_device = args.device
@@ -122,8 +124,10 @@ def main():
         # Camera capture #####################################################
         #ret, image = cap.read()
         frames = pipeline.wait_for_frames()
+        print (len(frames))
         image = frames.get_color_frame()
-        print (image)
+        #image = frames.get_delpth_frame()
+        #print (image)
         image = np.asanyarray(image.get_data())
         print("testing")
 
