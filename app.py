@@ -46,8 +46,10 @@ def main():
 
     pipeline = rs.pipeline()
     config = rs.config()
-    config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
-    config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+    xres, yres = 1280, 720
+
+    config.enable_stream(rs.stream.depth, xres, yres, rs.format.z16, 30)
+    config.enable_stream(rs.stream.color, xres, yres, rs.format.bgr8, 30)
 
     pipeline.start(config)
 
@@ -126,10 +128,7 @@ def main():
         frames = pipeline.wait_for_frames()
         print (len(frames))
         image = frames.get_color_frame()
-        #image = frames.get_delpth_frame()
-        #print (image)
         image = np.asanyarray(image.get_data())
-        print("testing")
 
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         
