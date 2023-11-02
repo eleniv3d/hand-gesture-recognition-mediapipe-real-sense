@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import csv
 import copy
-import argparse
 import itertools
 from collections import Counter
 from collections import deque
@@ -19,6 +18,8 @@ from model import PointHistoryClassifier
 
 def main():
 
+
+    #real sense related
     pipeline = rs.pipeline()
     config = rs.config()
     xres, yres = 1280, 720
@@ -28,6 +29,7 @@ def main():
 
     pipeline.start(config)
 
+    #parameters for Hand Detection
     use_static_image_mode = False
     min_detection_confidence = 0.5
     min_tracking_confidence = 0.5
@@ -38,7 +40,7 @@ def main():
     mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(
         static_image_mode=use_static_image_mode,
-        max_num_hands=1,
+        max_num_hands=2,
         min_detection_confidence=min_detection_confidence,
         min_tracking_confidence=min_tracking_confidence,
     )
@@ -72,7 +74,7 @@ def main():
     # Finger gesture history ################################################
     finger_gesture_history = deque(maxlen=history_length)
 
-    #  ########################################################################
+    #########################################################################
     mode = 0
 
     while True:
@@ -99,12 +101,10 @@ def main():
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         image.flags.writeable = False
         results = hands.process(image)
-        print (results)
         image.flags.writeable = True
 
         #  ####################################################################
         if results.multi_hand_landmarks is not None:
-            print ("running")
             for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
                                                   results.multi_handedness):
                 # Bounding box calculation
