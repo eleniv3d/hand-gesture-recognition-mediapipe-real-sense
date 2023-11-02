@@ -217,7 +217,7 @@ def calc_landmark_list(image, landmarks):
 def pre_process_landmark(landmark_list):
     temp_landmark_list = copy.deepcopy(landmark_list)
 
-    # Convert to relative coordinates
+    # Convert to relative coordinates to the wrist point
     base_x, base_y = 0, 0
     for index, landmark_point in enumerate(temp_landmark_list):
         if index == 0:

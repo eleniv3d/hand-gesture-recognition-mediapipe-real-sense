@@ -12,7 +12,7 @@ model_save_path = 'model/keypoint_classifier/keypoint_classifier.hdf5'
 tflite_save_path = 'model/keypoint_classifier/keypoint_classifier.tflite'
 
 #set number of classes
-NUM_CLASSES = 4
+NUM_CLASSES = 7
 
 #dataset reading
 X_dataset = np.loadtxt(dataset, delimiter=',', dtype='float32', usecols=list(range(1, (21 * 2) + 1)))
