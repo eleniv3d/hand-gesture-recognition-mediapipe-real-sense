@@ -17,32 +17,7 @@ from model import KeyPointClassifier
 from model import PointHistoryClassifier
 
 
-# def get_args():
-#     parser = argparse.ArgumentParser()
-
-#     parser.add_argument("--device", type=int, default=0)
-#     parser.add_argument("--width", help='cap width', type=int, default=960)
-#     parser.add_argument("--height", help='cap height', type=int, default=540)
-
-#     parser.add_argument('--use_static_image_mode', action='store_true')
-#     parser.add_argument("--min_detection_confidence",
-#                         help='min_detection_confidence',
-#                         type=float,
-#                         default=0.7)
-#     parser.add_argument("--min_tracking_confidence",
-#                         help='min_tracking_confidence',
-#                         type=int,
-#                         default=0.5)
-
-#     args = parser.parse_args()
-
-#     return args
-
-
 def main():
-    # Argument parsing #################################################################
-    #args = get_args()
-    #real-sense related
 
     pipeline = rs.pipeline()
     config = rs.config()
@@ -53,24 +28,11 @@ def main():
 
     pipeline.start(config)
 
-    #cap_device = args.device
-    #cap_width = args.width
-    #cap_height = args.height
-
-    # use_static_image_mode = args.use_static_image_mode
-    # min_detection_confidence = args.min_detection_confidence
-    # min_tracking_confidence = args.min_tracking_confidence
-
     use_static_image_mode = False
     min_detection_confidence = 0.5
     min_tracking_confidence = 0.5
 
     use_brect = True
-    # Camera preparation ###############################################################
-    #cap = cv.VideoCapture(cap_device)
-    #cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
-    #cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
-    
 
     # Model load #############################################################
     mp_hands = mp.solutions.hands
@@ -114,43 +76,35 @@ def main():
     mode = 0
 
     while True:
-
         fps = cvFpsCalc.get()
         
         # Process Key (ESC: end) #################################################
         key = cv.waitKey(10)
         if key == 27:  # ESC
             break
+
         number, mode = select_mode(key, mode)
 
         # Camera capture #####################################################
         #ret, image = cap.read()
         frames = pipeline.wait_for_frames()
-        print (len(frames))
         image = frames.get_color_frame()
         image = np.asanyarray(image.get_data())
-
-        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         
-        if not image:
-            print("Ignoring empty camera frame.")
-            # If loading a video, use 'break' instead of 'continue'.
-            continue
-
-        # if not ret:
-        #     break
+        #image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         image = cv.flip(image, 1)  # Mirror display
         debug_image = copy.deepcopy(image)
 
         # Detection implementation #############################################################
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-
         image.flags.writeable = False
         results = hands.process(image)
+        print (results)
         image.flags.writeable = True
 
         #  ####################################################################
         if results.multi_hand_landmarks is not None:
+            print ("running")
             for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
                                                   results.multi_handedness):
                 # Bounding box calculation
