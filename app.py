@@ -15,7 +15,6 @@ from utils import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
 
-
 def main():
 
     #real sense related
@@ -75,7 +74,6 @@ def main():
 
     #########################################################################
     mode = 0
-    print (mode)
 
     while True:
         fps = cvFpsCalc.get()
@@ -529,4 +527,5 @@ def draw_info(image, fps, mode, number):
 
 
 if __name__ == '__main__':
+    print("here")
     main()
