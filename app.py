@@ -75,6 +75,7 @@ def main():
 
     #########################################################################
     mode = 0
+    print (mode)
 
     while True:
         fps = cvFpsCalc.get()
