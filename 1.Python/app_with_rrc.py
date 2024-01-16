@@ -15,8 +15,21 @@ from utils import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
 
-import compas_rrc as rrc
+# import compas_rrc as rrc
 
+# # Create Ros Client
+# ros = rrc.RosClient()
+# ros.run()
+
+# # Create ABB Client
+# abb = rrc.AbbClient(ros, '/rob1')
+# print('Connected.')
+
+# # Set tool
+# abb.send(rrc.SetTool('tool0'))
+
+# # Set work object
+# abb.send(rrc.SetWorkObject('wobj0'))
 
 def main():
 
@@ -78,20 +91,6 @@ def main():
     #########################################################################
     mode = 0
 
-    # Create Ros Client
-    ros = rrc.RosClient()
-    ros.run()
-
-    # Create ABB Client
-    abb = rrc.AbbClient(ros, '/rob1')
-    print('Connected.')
-
-    # Set tool
-    abb.send(rrc.SetTool('tool0'))
-
-    # Set work object
-    abb.send(rrc.SetWorkObject('wobj0'))
-
     while True:
         fps = cvFpsCalc.get()
         
@@ -150,19 +149,19 @@ def main():
 
                 print(hand_sign_id)
 
-                # Read current frame position
-                frame = abb.send_and_wait(rrc.GetFrame())
-                # Change the x-value [mm]
-                if hand_sign_id == 0:
-                    frame.point[0] -= 50
-                elif hand_sign_id == 1:
-                    frame.point[1] -= 50
+                # # Read current frame position
+                # frame = abb.send_and_wait(rrc.GetFrame())
+                # # Change the x-value [mm]
+                # if hand_sign_id == 0:
+                #     frame.point[0] -= 50
+                # elif hand_sign_id == 1:
+                #     frame.point[1] -= 50
 
-                # Set speed [mm/s]
-                speed = 100
+                # # Set speed [mm/s]
+                # speed = 100
     
-                # Move robot the new pos
-                done = abb.send_and_wait(rrc.MoveToFrame(frame, speed, rrc.Zone.FINE, rrc.Motion.LINEAR))
+                # # Move robot the new pos
+                # done = abb.send_and_wait(rrc.MoveToFrame(frame, speed, rrc.Zone.FINE, rrc.Motion.LINEAR))
 
                 # Finger gesture classification
                 finger_gesture_id = 0
@@ -197,8 +196,8 @@ def main():
 
     #cap.release()
     cv.destroyAllWindows()
-    ros.close()
-    ros.terminate()
+    # ros.close()
+    # ros.terminate()
 
 
 def select_mode(key, mode):

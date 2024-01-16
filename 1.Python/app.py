@@ -527,5 +527,4 @@ def draw_info(image, fps, mode, number):
 
 
 if __name__ == '__main__':
-    print("here")
     main()
